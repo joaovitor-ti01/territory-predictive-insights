@@ -31,285 +31,316 @@ class TerritoryApp extends StatelessWidget {
   }
 }
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: backgroundColor,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'TERRITORY',
-              style: TextStyle(
-                color: primaryGreen,
-                fontSize: 11,
-                letterSpacing: 3,
-                fontWeight: FontWeight.bold,
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+  class _DashboardPageState extends State<DashboardPage> {
+    int _selectedIndex = 0;
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          title: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'TERRITORY',
+                style: TextStyle(
+                  color: primaryGreen,
+                  fontSize: 11,
+                  letterSpacing: 3,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+              Text(
+                'Predictive Insights',
+                style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.notifications_outlined),
             ),
-            Text(
-              'Predictive Insights',
-              style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-            ),
+            const SizedBox(width: 8),
           ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_outlined),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'PAINEL OPERACIONAL',
-              style: TextStyle(
-                color: secondaryText,
-                fontSize: 11,
-                letterSpacing: 2,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Visão geral do território',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Acompanhe indicadores e riscos identificados.',
-              style: TextStyle(color: secondaryText),
-            ),
-            const SizedBox(height: 24),
-
-            // Indicador principal
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF123D36), Color(0xFF152B35)],
+        body: IndexedStack(
+         index: _selectedIndex,
+         children: [
+        SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'PAINEL OPERACIONAL',
+                style: TextStyle(
+                  color: secondaryText,
+                  fontSize: 11,
+                  letterSpacing: 2,
+                  fontWeight: FontWeight.bold,
                 ),
-                border: Border.all(color: primaryGreen.withValues(alpha: 0.25)),
               ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 8),
+              const Text(
+                'Visão geral do território',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Acompanhe indicadores e riscos identificados.',
+                style: TextStyle(color: secondaryText),
+              ),
+              const SizedBox(height: 24),
+
+              // Indicador principal
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF123D36), Color(0xFF152B35)],
+                  ),
+                  border: Border.all(color: primaryGreen.withValues(alpha: 0.25)),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.analytics_outlined, color: primaryGreen),
+                        SizedBox(width: 8),
+                        Text(
+                            'ÍNDICE DE MONITORAMENTO',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                            color: secondaryText,
+                            fontSize: 11,
+                            letterSpacing: 1,
+                          ),
+                        
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 18),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '82',
+                          style: TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            color: primaryGreen,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 9, left: 5),
+                          child: Text(
+                            '/100',
+                            style: TextStyle(color: secondaryText),
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          'MONITORAMENTO ATIVO',
+                          style: TextStyle(
+                            color: primaryGreen,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      child: LinearProgressIndicator(
+                        value: 0.82,
+                        minHeight: 8,
+                        backgroundColor: Color(0xFF30443F),
+                        valueColor: AlwaysStoppedAnimation(primaryGreen),
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Indicador demonstrativo para o protótipo.',
+                      style: TextStyle(color: secondaryText, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              const Text(
+                'INDICADORES TERRITORIAIS',
+                style: TextStyle(
+                  fontSize: 12,
+                  letterSpacing: 1.5,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              const Row(
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.analytics_outlined, color: primaryGreen),
-                      SizedBox(width: 8),
-                      Text(
-                           'ÍNDICE DE MONITORAMENTO',
-                            maxLines: 2,
-                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                          color: secondaryText,
-                          fontSize: 11,
-                          letterSpacing: 1,
-                        ),
-                      
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 18),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '82',
-                        style: TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: primaryGreen,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 9, left: 5),
-                        child: Text(
-                          '/100',
-                          style: TextStyle(color: secondaryText),
-                        ),
-                      ),
-                      Spacer(),
-                      Text(
-                        'MONITORAMENTO ATIVO',
-                        style: TextStyle(
-                          color: primaryGreen,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    child: LinearProgressIndicator(
-                      value: 0.82,
-                      minHeight: 8,
-                      backgroundColor: Color(0xFF30443F),
-                      valueColor: AlwaysStoppedAnimation(primaryGreen),
+                  Expanded(
+                    child: MetricCard(
+                      title: 'Regiões',
+                      value: '24',
+                      subtitle: 'Monitoradas',
+                      icon: Icons.location_on_outlined,
+                      color: Color(0xFF60A5FA),
                     ),
                   ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Indicador demonstrativo para o protótipo.',
-                    style: TextStyle(color: secondaryText, fontSize: 11),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: MetricCard(
+                      title: 'Alertas',
+                      value: '08',
+                      subtitle: 'Identificados',
+                      icon: Icons.warning_amber_rounded,
+                      color: Color(0xFFFBBF24),
+                    ),
                   ),
                 ],
               ),
-            ),
 
-            const SizedBox(height: 28),
+              const SizedBox(height: 12),
 
-            const Text(
-              'INDICADORES TERRITORIAIS',
-              style: TextStyle(
-                fontSize: 12,
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.bold,
+              const Row(
+                children: [
+                  Expanded(
+                    child: MetricCard(
+                      title: 'Risco alto',
+                      value: '03',
+                      subtitle: 'Regiões críticas',
+                      icon: Icons.error_outline,
+                      color: Color(0xFFF87171),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: MetricCard(
+                      title: 'Dados',
+                      value: '96%',
+                      subtitle: 'Disponibilidade',
+                      icon: Icons.cloud_done_outlined,
+                      color: primaryGreen,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 14),
 
-            const Row(
-              children: [
-                Expanded(
-                  child: MetricCard(
-                    title: 'Regiões',
-                    value: '24',
-                    subtitle: 'Monitoradas',
-                    icon: Icons.location_on_outlined,
-                    color: Color(0xFF60A5FA),
+              const SizedBox(height: 28),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'ALERTAS PRIORITÁRIOS',
+                    style: TextStyle(
+                      fontSize: 12,
+                      letterSpacing: 1.5,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: MetricCard(
-                    title: 'Alertas',
-                    value: '08',
-                    subtitle: 'Identificados',
-                    icon: Icons.warning_amber_rounded,
-                    color: Color(0xFFFBBF24),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      'Ver todos',
+                      style: TextStyle(color: primaryGreen),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
 
-            const SizedBox(height: 12),
+              const AlertCard(
+                title: 'Região Norte',
+                description: 'Aumento de risco identificado',
+                severity: 'ALTO',
+                color: Color(0xFFF87171),
+                icon: Icons.trending_up,
+              ),
 
-            const Row(
-              children: [
-                Expanded(
-                  child: MetricCard(
-                    title: 'Risco alto',
-                    value: '03',
-                    subtitle: 'Regiões críticas',
-                    icon: Icons.error_outline,
-                    color: Color(0xFFF87171),
-                  ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: MetricCard(
-                    title: 'Dados',
-                    value: '96%',
-                    subtitle: 'Disponibilidade',
-                    icon: Icons.cloud_done_outlined,
-                    color: primaryGreen,
-                  ),
-                ),
-              ],
-            ),
+              const SizedBox(height: 10),
 
-            const SizedBox(height: 28),
+              const AlertCard(
+                title: 'Região Central',
+                description: 'Necessita de monitoramento',
+                severity: 'MÉDIO',
+                color: Color(0xFFFBBF24),
+                icon: Icons.visibility_outlined,
+              ),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'ALERTAS PRIORITÁRIOS',
+              const SizedBox(height: 24),
+
+              const Center(
+                child: Text(
+                  'TERRITORY PREDICTIVE INSIGHTS • 2026',
                   style: TextStyle(
-                    fontSize: 12,
-                    letterSpacing: 1.5,
-                    fontWeight: FontWeight.bold,
+                    color: secondaryText,
+                    fontSize: 10,
+                    letterSpacing: 1,
                   ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'Ver todos',
-                    style: TextStyle(color: primaryGreen),
-                  ),
-                ),
-              ],
-            ),
-
-            const AlertCard(
-              title: 'Região Norte',
-              description: 'Aumento de risco identificado',
-              severity: 'ALTO',
-              color: Color(0xFFF87171),
-              icon: Icons.trending_up,
-            ),
-
-            const SizedBox(height: 10),
-
-            const AlertCard(
-              title: 'Região Central',
-              description: 'Necessita de monitoramento',
-              severity: 'MÉDIO',
-              color: Color(0xFFFBBF24),
-              icon: Icons.visibility_outlined,
-            ),
-
-            const SizedBox(height: 24),
-
-            const Center(
-              child: Text(
-                'TERRITORY PREDICTIVE INSIGHTS • 2026',
-                style: TextStyle(
-                  color: secondaryText,
-                  fontSize: 10,
-                  letterSpacing: 1,
                 ),
               ),
+              const SizedBox(height: 12),
+            ],
+          ),
             ),
-            const SizedBox(height: 12),
+    const _SectionPage(
+      title: 'Dados territoriais',
+      description: 'Indicadores, estatísticas e evolução dos dados.',
+      icon: Icons.bar_chart,
+    ),
+    const _SectionPage(
+      title: 'Mapa territorial',
+      description: 'Visualização das regiões monitoradas.',
+      icon: Icons.map_outlined,
+    ),
+    const _SectionPage(
+      title: 'Central de alertas',
+      description: 'Acompanhe riscos, evidências e alertas identificados.',
+      icon: Icons.notifications_active_outlined,
+        ),
+     ],
+   ),
+          bottomNavigationBar: NavigationBar(
+          backgroundColor: cardColor,
+          indicatorColor: primaryGreen.withValues(alpha: 0.15),
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.dashboard_outlined),
+              label: 'Painel',
+            ),
+            NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Dados'),
+            NavigationDestination(icon: Icon(Icons.map_outlined), label: 'Mapa'),
+            NavigationDestination(
+              icon: Icon(Icons.notifications_outlined),
+              label: 'Alertas',
+            ),
           ],
         ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        backgroundColor: cardColor,
-        indicatorColor: primaryGreen.withValues(alpha: 0.15),
-        selectedIndex: 0,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            label: 'Painel',
-          ),
-          NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Dados'),
-          NavigationDestination(icon: Icon(Icons.map_outlined), label: 'Mapa'),
-          NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            label: 'Alertas',
-          ),
-        ],
-      ),
-    );
+      );
+    }
   }
-}
 
 class MetricCard extends StatelessWidget {
   final String title;
@@ -412,6 +443,55 @@ class AlertCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SectionPage extends StatelessWidget {
+  final String title;
+  final String description;
+  final IconData icon;
+
+  const _SectionPage({
+    required this.title,
+    required this.description,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 64,
+              color: primaryGreen,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: secondaryText,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
