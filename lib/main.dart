@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:fl_chart/fl_chart.dart';
 void main() {
   runApp(const TerritoryApp());
 }
@@ -299,11 +299,7 @@ class DashboardPage extends StatefulWidget {
             ],
           ),
             ),
-    const _SectionPage(
-      title: 'Dados territoriais',
-      description: 'Indicadores, estatísticas e evolução dos dados.',
-      icon: Icons.bar_chart,
-    ),
+    const DataDashboardPage(),
     const _SectionPage(
       title: 'Mapa territorial',
       description: 'Visualização das regiões monitoradas.',
@@ -315,7 +311,7 @@ class DashboardPage extends StatefulWidget {
       icon: Icons.notifications_active_outlined,
         ),
      ],
-   ),
+        ),
           bottomNavigationBar: NavigationBar(
           backgroundColor: cardColor,
           indicatorColor: primaryGreen.withValues(alpha: 0.15),
@@ -341,6 +337,213 @@ class DashboardPage extends StatefulWidget {
       );
     }
   }
+
+class DataDashboardPage extends StatelessWidget {
+  const DataDashboardPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'INTELIGÊNCIA TERRITORIAL',
+            style: TextStyle(
+              color: secondaryText,
+              fontSize: 11,
+              letterSpacing: 2,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Análise de dados',
+            style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Acompanhe a evolução dos indicadores.',
+            style: TextStyle(color: secondaryText),
+          ),
+          const SizedBox(height: 24),
+
+          const Row(
+            children: [
+              Expanded(
+                child: MetricCard(
+                  title: 'Risco atual',
+                  value: '68%',
+                  subtitle: 'Índice demonstrativo',
+                  icon: Icons.trending_up,
+                  color: Color(0xFFFBBF24),
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: MetricCard(
+                  title: 'Variação',
+                  value: '+34%',
+                  subtitle: 'No período',
+                  icon: Icons.show_chart,
+                  color: Color(0xFFF87171),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 28),
+
+          const Text(
+            'EVOLUÇÃO DO RISCO TERRITORIAL',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Últimos seis meses • Dados simulados',
+            style: TextStyle(
+              color: secondaryText,
+              fontSize: 11,
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          Container(
+            height: 260,
+            padding: const EdgeInsets.fromLTRB(8, 20, 16, 8),
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.06),
+              ),
+            ),
+            child: BarChart(
+              BarChartData(
+                maxY: 100,
+                minY: 0,
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                ),
+                borderData: FlBorderData(show: false),
+                barTouchData: BarTouchData(enabled: true),
+                titlesData: FlTitlesData(
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 35,
+                      interval: 20,
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          '${value.toInt()}',
+                          style: const TextStyle(
+                            color: secondaryText,
+                            fontSize: 10,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        const months = [
+                          'JUN',
+                          'JUL',
+                          'AGO',
+                          'SET',
+                          'OUT',
+                          'NOV',
+                        ];
+
+                        final index = value.toInt();
+
+                        if (index < 0 || index >= months.length) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            months[index],
+                            style: const TextStyle(
+                              color: secondaryText,
+                              fontSize: 10,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                barGroups: [
+                  _bar(0, 34),
+                  _bar(1, 42),
+                  _bar(2, 39),
+                  _bar(3, 51),
+                  _bar(4, 59),
+                  _bar(5, 68),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          const AlertCard(
+            title: 'Tendência de crescimento',
+            description:
+                'O índice demonstrativo apresenta aumento no período analisado.',
+            severity: 'ATENÇÃO',
+            color: Color(0xFFFBBF24),
+            icon: Icons.trending_up,
+          ),
+
+          const SizedBox(height: 16),
+
+          const Text(
+            'Os valores apresentados são simulados para demonstração '
+            'do protótipo e não representam medições reais.',
+            style: TextStyle(
+              color: secondaryText,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static BarChartGroupData _bar(int x, double value) {
+    return BarChartGroupData(
+      x: x,
+      barRods: [
+        BarChartRodData(
+          toY: value,
+          color: primaryGreen,
+          width: 18,
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ],
+    );
+  }
+}
 
 class MetricCard extends StatelessWidget {
   final String title;
