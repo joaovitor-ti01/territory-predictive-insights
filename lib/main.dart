@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+
 void main() {
   runApp(const TerritoryApp());
 }
@@ -300,11 +303,7 @@ class DashboardPage extends StatefulWidget {
           ),
             ),
     const DataDashboardPage(),
-    const _SectionPage(
-      title: 'Mapa territorial',
-      description: 'Visualização das regiões monitoradas.',
-      icon: Icons.map_outlined,
-    ),
+   const MapTerritorialPage(),
     const _SectionPage(
       title: 'Central de alertas',
       description: 'Acompanhe riscos, evidências e alertas identificados.',
@@ -337,6 +336,226 @@ class DashboardPage extends StatefulWidget {
       );
     }
   }
+
+
+
+class MapTerritorialPage extends StatelessWidget {
+  const MapTerritorialPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    
+final regioes = [
+  _criarMarcador(
+    context,
+    const LatLng(-23.5614, -46.6559),
+    Colors.red,
+    'Região Paulista',
+    'Alto',
+    'Indicador de risco elevado no cenário demonstrativo.',
+  ),
+  _criarMarcador(
+    context,
+    const LatLng(-23.5505, -46.6333),
+    Colors.orange,
+    'Região Central',
+    'Médio',
+    'Variação moderada dos indicadores monitorados.',
+  ),
+  _criarMarcador(
+    context,
+    const LatLng(-23.5666, -46.7017),
+    Colors.green,
+    'Região Butantã',
+    'Baixo',
+    'Indicadores estáveis no cenário demonstrativo.',
+  ),
+  _criarMarcador(
+    context,
+    const LatLng(-23.5235, -46.4816),
+    Colors.orange,
+    'Região Itaquera',
+    'Médio',
+    'Necessidade de acompanhamento dos indicadores.',
+  ),
+  _criarMarcador(
+    context,
+    const LatLng(-23.6528, -46.7108),
+    Colors.red,
+    'Região Capão Redondo',
+    'Alto',
+    'Indicador de atenção prioritária no cenário demonstrativo.',
+  ),
+];
+
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Mapa territorial',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Monitoramento de regiões de São Paulo',
+            style: TextStyle(color: Color(0xFF94A3B8)),
+          ),
+          const SizedBox(height: 16),
+
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: FlutterMap(
+                options: const MapOptions(
+                  initialCenter: LatLng(-23.5505, -46.6333),
+                  initialZoom: 10.5,
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName:
+                        'com.joaovitor.territory.territory_predictive_insights',
+                  ),
+                  MarkerLayer(markers: regioes),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 14),
+          const Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            children: [
+              _MapLegend(color: Colors.green, label: 'Baixo risco'),
+              _MapLegend(color: Colors.orange, label: 'Médio risco'),
+              _MapLegend(color: Colors.red, label: 'Alto risco'),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Marcadores demonstrativos. Não representam medições reais.',
+            style: TextStyle(
+              color: Color(0xFF94A3B8),
+              fontSize: 11,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Mapa © OpenStreetMap contributors',
+            style: TextStyle(
+              color: Color(0xFF94A3B8),
+              fontSize: 10,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Marker _criarMarcador(
+    BuildContext context,
+    LatLng ponto,
+    Color cor,
+    String regiao,
+    String risco,
+    String evidencia,
+  ) {
+    return Marker(
+      point: ponto,
+      width: 48,
+      height: 48,
+      child: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: const Color(0xFF151F30),
+              title: Text(
+                regiao,
+                style: const TextStyle(color: Colors.white),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Nível de risco: $risco',
+                    style: TextStyle(
+                      color: cor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    evidencia,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Dados demonstrativos. A avaliação final exige validação humana.',
+                    style: TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Fechar'),
+                ),
+              ],
+            ),
+          );
+        },
+        child: Icon(
+          Icons.location_on,
+          color: cor,
+          size: 42,
+        ),
+      ),
+    );
+  }
+
+}
+
+class _MapLegend extends StatelessWidget {
+  final Color color;
+  final String label;
+
+  const _MapLegend({
+    required this.color,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircleAvatar(radius: 5, backgroundColor: color),
+        const SizedBox(width: 5),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 class DataDashboardPage extends StatelessWidget {
   const DataDashboardPage({super.key});
