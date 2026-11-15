@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const TerritoryApp());
@@ -103,6 +104,7 @@ class DashboardPage extends StatefulWidget {
               ),
               const SizedBox(height: 24),
 
+
               // Indicador principal
               Container(
                 width: double.infinity,
@@ -110,27 +112,36 @@ class DashboardPage extends StatefulWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(18),
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF123D36), Color(0xFF152B35)],
+                    colors: [
+                      Color(0xFF123D36),
+                      Color(0xFF152B35),
+                    ],
                   ),
-                  border: Border.all(color: primaryGreen.withValues(alpha: 0.25)),
+                  border: Border.all(
+                    color: primaryGreen.withValues(alpha: 0.25),
+                  ),
                 ),
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.analytics_outlined, color: primaryGreen),
+                        Icon(
+                          Icons.analytics_outlined,
+                          color: primaryGreen,
+                        ),
                         SizedBox(width: 8),
-                        Text(
+                        Expanded(
+                          child: Text(
                             'ÍNDICE DE MONITORAMENTO',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                            color: secondaryText,
-                            fontSize: 11,
-                            letterSpacing: 1,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: secondaryText,
+                              fontSize: 11,
+                              letterSpacing: 1,
+                            ),
                           ),
-                        
                         ),
                       ],
                     ),
@@ -177,7 +188,10 @@ class DashboardPage extends StatefulWidget {
                     SizedBox(height: 12),
                     Text(
                       'Indicador demonstrativo para o protótipo.',
-                      style: TextStyle(color: secondaryText, fontSize: 11),
+                      style: TextStyle(
+                        color: secondaryText,
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
@@ -304,11 +318,7 @@ class DashboardPage extends StatefulWidget {
             ),
     const DataDashboardPage(),
    const MapTerritorialPage(),
-    const _SectionPage(
-      title: 'Central de alertas',
-      description: 'Acompanhe riscos, evidências e alertas identificados.',
-      icon: Icons.notifications_active_outlined,
-        ),
+  const AlertsPage(),
      ],
         ),
           bottomNavigationBar: NavigationBar(
@@ -870,47 +880,717 @@ class AlertCard extends StatelessWidget {
   }
 }
 
-class _SectionPage extends StatelessWidget {
-  final String title;
-  final String description;
-  final IconData icon;
 
-  const _SectionPage({
+class AlertsPage extends StatelessWidget {
+  const AlertsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Central de alertas',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Acompanhamento de riscos territoriais',
+            style: TextStyle(color: Color(0xFF94A3B8)),
+          ),
+          const SizedBox(height: 20),
+
+          Row(
+            children: const [
+              Expanded(
+                child: _AlertMetric(
+                  title: 'Total de alertas',
+                  value: '08',
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _AlertMetric(
+                  title: 'Alta prioridade',
+                  value: '03',
+                  color: Colors.redAccent,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+          const Text(
+            'ALERTAS PRIORITÁRIOS',
+            style: TextStyle(
+              color: Color(0xFF94A3B8),
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          const _OperationalAlert(
+            region: 'Região Paulista',
+            level: 'ALTO',
+            confidence: '87%',
+            evidence: 'Indicador de risco elevado no cenário demonstrativo.',
+            recommendation: 'Priorizar vistoria e validar as condições locais.',
+            color: Colors.redAccent,
+          ),
+
+          const _OperationalAlert(
+            region: 'Região Central',
+            level: 'MÉDIO',
+            confidence: '72%',
+            evidence: 'Variação moderada nos indicadores monitorados.',
+            recommendation: 'Acompanhar a evolução dos indicadores.',
+            color: Colors.orange,
+          ),
+
+          const _OperationalAlert(
+            region: 'Região Butantã',
+            level: 'BAIXO',
+            confidence: '91%',
+            evidence: 'Indicadores estáveis no cenário demonstrativo.',
+            recommendation: 'Manter o monitoramento periódico.',
+            color: Colors.green,
+          ),
+
+          const SizedBox(height: 16),
+          const Text(
+            'Os alertas são demonstrativos. A confiança representa '
+            'um valor ilustrativo, não uma probabilidade validada. '
+            'Toda recomendação exige avaliação humana.',
+            style: TextStyle(
+              color: Color(0xFF94A3B8),
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AlertMetric extends StatelessWidget {
+  final String title;
+  final String value;
+  final Color color;
+
+  const _AlertMetric({
     required this.title,
-    required this.description,
-    required this.icon,
+    required this.value,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 64,
-              color: primaryGreen,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF151F30),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xFF94A3B8),
+              fontSize: 12,
             ),
-            const SizedBox(height: 20),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+class AlertDetailPage extends StatefulWidget {
+  final String region;
+  final String level;
+  final String confidence;
+  final String evidence;
+  final String recommendation;
+  final Color color;
+
+  const AlertDetailPage({
+    super.key,
+    required this.region,
+    required this.level,
+    required this.confidence,
+    required this.evidence,
+    required this.recommendation,
+    required this.color,
+  });
+
+  @override
+  State<AlertDetailPage> createState() => _AlertDetailPageState();
+}
+
+class _AlertDetailPageState extends State<AlertDetailPage> {
+  bool analisado = false;
+  bool carregando = true;
+
+  String get chaveAlerta => 'alerta_analisado_${widget.region}';
+
+  @override
+  void initState() {
+    super.initState();
+    carregarAnalise();
+  }
+
+  Future<void> carregarAnalise() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final statusSalvo = prefs.getBool(chaveAlerta) ?? false;
+
+    if (!mounted) return;
+
+    setState(() {
+      analisado = statusSalvo;
+      carregando = false;
+    });
+  }
+
+  Future<void> alternarAnalise() async {
+    final novoStatus = !analisado;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    final salvou = await prefs.setBool(chaveAlerta, novoStatus);
+
+    if (!mounted) return;
+
+    if (salvou) {
+      setState(() {
+        analisado = novoStatus;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não foi possível salvar a análise.'),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0B1220),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0B1220),
+        foregroundColor: Colors.white,
+        title: const Text('Detalhes do alerta'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'REGIÃO MONITORADA',
+              style: TextStyle(
+                color: Color(0xFF94A3B8),
+                fontSize: 12,
+                letterSpacing: 1,
+              ),
+            ),
+            const SizedBox(height: 8),
             Text(
-              title,
-              textAlign: TextAlign.center,
+              widget.region,
               style: const TextStyle(
-                fontSize: 24,
+                color: Colors.white,
+                fontSize: 25,
                 fontWeight: FontWeight.bold,
               ),
             ),
+            const SizedBox(height: 20),
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: const Color(0xFF151F30),
+                borderRadius: BorderRadius.circular(16),
+                border: Border(
+                  left: BorderSide(color: widget.color, width: 4),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'NÍVEL DE RISCO',
+                    style: TextStyle(color: Color(0xFF94A3B8)),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.level,
+                    style: TextStyle(
+                      color: widget.color,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'CONFIANÇA ILUSTRATIVA',
+                    style: TextStyle(color: Color(0xFF94A3B8)),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.confidence,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+            const Text(
+              'Evidências identificadas',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            _detailCard(widget.evidence),
+
+            const SizedBox(height: 22),
+            const Text(
+              'Recomendação operacional',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            _detailCard(widget.recommendation),
+
+            const SizedBox(height: 22),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF151F30),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'VALIDAÇÃO HUMANA',
+                    style: TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 12,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    carregando
+                        ? 'Carregando análise...'
+                        : analisado
+                            ? 'Alerta analisado pelo operador.'
+                            : 'Aguardando análise humana.',
+                    style: TextStyle(
+                      color: analisado ? primaryGreen : Colors.orange,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: carregando ? null : alternarAnalise,
+                      icon: Icon(
+                        analisado
+                            ? Icons.undo
+                            : Icons.check_circle_outline,
+                      ),
+                      label: Text(
+                        analisado
+                            ? 'Desfazer análise'
+                            : 'Registrar análise humana',
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryGreen,
+                        foregroundColor: const Color(0xFF0B1220),
+                        padding: const EdgeInsets.all(14),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+            const Text(
+              'Aviso: os indicadores e níveis de confiança desta versão '
+              'são demonstrativos. Não representam previsões validadas. '
+              'A decisão final deve ser realizada por um responsável humano.',
+              style: TextStyle(
+                color: Color(0xFF94A3B8),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _detailCard(String content) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF151F30),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Text(
+        content,
+        style: const TextStyle(
+          color: Colors.white70,
+          fontSize: 14,
+          height: 1.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _AlertDetailPageState extends State<AlertDetailPage> {
+  bool analisado = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0B1220),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0B1220),
+        foregroundColor: Colors.white,
+        title: const Text('Detalhes do alerta'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'REGIÃO MONITORADA',
+              style: TextStyle(
+                color: Color(0xFF94A3B8),
+                fontSize: 12,
+                letterSpacing: 1,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              widget.region,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: const Color(0xFF151F30),
+                borderRadius: BorderRadius.circular(16),
+                border: Border(
+                  left: BorderSide(color: widget.color, width: 4),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'NÍVEL DE RISCO',
+                    style: TextStyle(color: Color(0xFF94A3B8)),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.level,
+                    style: TextStyle(
+                      color: widget.color,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'CONFIANÇA ILUSTRATIVA',
+                    style: TextStyle(color: Color(0xFF94A3B8)),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.confidence,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+            const Text(
+              'Evidências identificadas',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            _detailCard(widget.evidence),
+
+            const SizedBox(height: 22),
+            const Text(
+              'Recomendação operacional',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            _detailCard(widget.recommendation),
+
+            const SizedBox(height: 22),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF151F30),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'VALIDAÇÃO HUMANA',
+                    style: TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 12,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    analisado
+                        ? 'Alerta analisado pelo operador.'
+                        : 'Aguardando análise humana.',
+                    style: TextStyle(
+                      color: analisado ? primaryGreen : Colors.orange,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          analisado = !analisado;
+                        });
+                      },
+                      icon: Icon(
+                        analisado
+                            ? Icons.undo
+                            : Icons.check_circle_outline,
+                      ),
+                      label: Text(
+                        analisado
+                            ? 'Desfazer análise'
+                            : 'Registrar análise humana',
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryGreen,
+                        foregroundColor: const Color(0xFF0B1220),
+                        padding: const EdgeInsets.all(14),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+            const Text(
+              'Aviso: os indicadores e níveis de confiança desta versão '
+              'são demonstrativos. Não representam previsões validadas. '
+              'A decisão final deve ser realizada por um responsável humano.',
+              style: TextStyle(
+                color: Color(0xFF94A3B8),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _detailCard(String content) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF151F30),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Text(
+        content,
+        style: const TextStyle(
+          color: Colors.white70,
+          fontSize: 14,
+          height: 1.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _OperationalAlert extends StatelessWidget {
+  final String region;
+  final String level;
+  final String confidence;
+  final String evidence;
+  final String recommendation;
+  final Color color;
+
+  const _OperationalAlert({
+    required this.region,
+    required this.level,
+    required this.confidence,
+    required this.evidence,
+    required this.recommendation,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AlertDetailPage(
+              region: region,
+              level: level,
+              confidence: confidence,
+              evidence: evidence,
+              recommendation: recommendation,
+              color: color,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF151F30),
+          borderRadius: BorderRadius.circular(14),
+          border: Border(
+            left: BorderSide(color: color, width: 4),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    region,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Text(
+                  level,
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
             Text(
-              description,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: secondaryText,
-                fontSize: 14,
-              ),
+              'Confiança ilustrativa: $confidence',
+              style: const TextStyle(color: Colors.white70),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Evidência: $evidence',
+              style: const TextStyle(color: Color(0xFF94A3B8)),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Recomendação: $recommendation',
+              style: const TextStyle(color: Colors.white),
+            ),
+            const SizedBox(height: 10),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  'VER DETALHES',
+                  style: TextStyle(
+                    color: primaryGreen,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(width: 5),
+                Icon(
+                  Icons.arrow_forward,
+                  color: primaryGreen,
+                  size: 14,
+                ),
+              ],
             ),
           ],
         ),
