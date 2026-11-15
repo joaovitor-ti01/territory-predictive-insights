@@ -3,6 +3,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'occurrence_page.dart';
+import 'environmental_dashboard_page.dart';
+import 'urban_services_dashboard_page.dart';
+import 'occurrence_store.dart';
 
 void main() {
   runApp(const TerritoryApp());
@@ -44,6 +48,11 @@ class DashboardPage extends StatefulWidget {
 
   class _DashboardPageState extends State<DashboardPage> {
     int _selectedIndex = 0;
+    @override
+    void initState() {
+    super.initState();
+    OccurrenceStore.load();
+}
     @override
     Widget build(BuildContext context) {
       return Scaffold(
@@ -103,7 +112,61 @@ class DashboardPage extends StatefulWidget {
                 style: TextStyle(color: secondaryText),
               ),
               const SizedBox(height: 24),
-
+            ValueListenableBuilder<int>(
+  valueListenable: OccurrenceStore.count,
+  builder: (context, quantidade, child) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: primaryGreen.withValues(alpha: 0.25),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.assignment_outlined,
+            color: primaryGreen,
+            size: 30,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'OCORRÊNCIAS REGISTRADAS',
+                  style: TextStyle(
+                    color: secondaryText,
+                    fontSize: 11,
+                    letterSpacing: 1,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  '$quantidade',
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: primaryGreen,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.trending_up,
+            color: primaryGreen,
+          ),
+        ],
+      ),
+    );
+  },
+),
 
               // Indicador principal
               Container(
@@ -317,8 +380,9 @@ class DashboardPage extends StatefulWidget {
           ),
             ),
     const DataDashboardPage(),
-   const MapTerritorialPage(),
-  const AlertsPage(),
+    const MapTerritorialPage(),
+    const AlertsPage(),
+    const OccurrencePage(),
      ],
         ),
           bottomNavigationBar: NavigationBar(
@@ -341,6 +405,10 @@ class DashboardPage extends StatefulWidget {
               icon: Icon(Icons.notifications_outlined),
               label: 'Alertas',
             ),
+            NavigationDestination(
+            icon: Icon(Icons.add_location_alt_outlined),
+            label: 'Registrar',
+          ),
           ],
         ),
       );
@@ -745,7 +813,39 @@ class DataDashboardPage extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
+          const SizedBox(height: 28),
 
+          const Text(
+            'OUTROS PAINÉIS TERRITORIAIS',
+            style: TextStyle(
+              color: secondaryText,
+              fontSize: 11,
+              letterSpacing: 2,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          _dashboardAccessCard(
+            context,
+            title: 'Riscos ambientais',
+            description: 'Acompanhe alagamentos e indicadores ambientais.',
+            icon: Icons.water_drop_outlined,
+            color: Color(0xFF38BDF8),
+            page: const EnvironmentalDashboardPage(),
+          ),
+
+          const SizedBox(height: 12),
+
+          _dashboardAccessCard(
+            context,
+            title: 'Serviços urbanos',
+            description: 'Monitore iluminação, resíduos e manutenção.',
+            icon: Icons.location_city_outlined,
+            color: Color(0xFF36D399),
+            page: const UrbanServicesDashboardPage(),
+          ),
           const Text(
             'Os valores apresentados são simulados para demonstração '
             'do protótipo e não representam medições reais.',
@@ -758,6 +858,67 @@ class DataDashboardPage extends StatelessWidget {
       ),
     );
   }
+  Widget _dashboardAccessCard(
+  BuildContext context, {
+  required String title,
+  required String description,
+  required IconData icon,
+  required Color color,
+  required Widget page,
+}) {
+  return InkWell(
+    borderRadius: BorderRadius.circular(16),
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => page),
+      );
+    },
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.06),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 30),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    color: secondaryText,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: secondaryText,
+            size: 16,
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   static BarChartGroupData _bar(int x, double value) {
     return BarChartGroupData(
@@ -1231,205 +1392,6 @@ class _AlertDetailPageState extends State<AlertDetailPage> {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: carregando ? null : alternarAnalise,
-                      icon: Icon(
-                        analisado
-                            ? Icons.undo
-                            : Icons.check_circle_outline,
-                      ),
-                      label: Text(
-                        analisado
-                            ? 'Desfazer análise'
-                            : 'Registrar análise humana',
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryGreen,
-                        foregroundColor: const Color(0xFF0B1220),
-                        padding: const EdgeInsets.all(14),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-            const Text(
-              'Aviso: os indicadores e níveis de confiança desta versão '
-              'são demonstrativos. Não representam previsões validadas. '
-              'A decisão final deve ser realizada por um responsável humano.',
-              style: TextStyle(
-                color: Color(0xFF94A3B8),
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _detailCard(String content) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF151F30),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Text(
-        content,
-        style: const TextStyle(
-          color: Colors.white70,
-          fontSize: 14,
-          height: 1.5,
-        ),
-      ),
-    );
-  }
-}
-
-class _AlertDetailPageState extends State<AlertDetailPage> {
-  bool analisado = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0B1220),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0B1220),
-        foregroundColor: Colors.white,
-        title: const Text('Detalhes do alerta'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'REGIÃO MONITORADA',
-              style: TextStyle(
-                color: Color(0xFF94A3B8),
-                fontSize: 12,
-                letterSpacing: 1,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              widget.region,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: const Color(0xFF151F30),
-                borderRadius: BorderRadius.circular(16),
-                border: Border(
-                  left: BorderSide(color: widget.color, width: 4),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'NÍVEL DE RISCO',
-                    style: TextStyle(color: Color(0xFF94A3B8)),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    widget.level,
-                    style: TextStyle(
-                      color: widget.color,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'CONFIANÇA ILUSTRATIVA',
-                    style: TextStyle(color: Color(0xFF94A3B8)),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    widget.confidence,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-            const Text(
-              'Evidências identificadas',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            _detailCard(widget.evidence),
-
-            const SizedBox(height: 22),
-            const Text(
-              'Recomendação operacional',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            _detailCard(widget.recommendation),
-
-            const SizedBox(height: 22),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF151F30),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'VALIDAÇÃO HUMANA',
-                    style: TextStyle(
-                      color: Color(0xFF94A3B8),
-                      fontSize: 12,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    analisado
-                        ? 'Alerta analisado pelo operador.'
-                        : 'Aguardando análise humana.',
-                    style: TextStyle(
-                      color: analisado ? primaryGreen : Colors.orange,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          analisado = !analisado;
-                        });
-                      },
                       icon: Icon(
                         analisado
                             ? Icons.undo
