@@ -200,7 +200,7 @@ flutter test
 
 ## Vídeo de apresentação
 
-**Link do vídeo:** inserir aqui o link da gravação final.
+**Link do vídeo:** (https://youtu.be/gMq9GJL1x68?is=fNE78svsQ1d7wIBG).
 
 ---
 
